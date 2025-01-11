@@ -1,0 +1,45 @@
+1.Check the Output
+If the command runs successfully, Kubernetes will typically provide feedback such as:
+    deployment.apps/<deployment-name> configured
+Review the output to confirm that the resources were applied correctly.
+2. Check the Deployment Status
+    Use the kubectl get deployments command to ensure the deployment exists and is active:
+    kubectl get deployments
+    This should display the deployment name, replicas, available pods, and status.
+3. Describe the Deployment
+Use the kubectl describe deployment <deployment-name> command to inspect details about the deployment:
+    kubectl describe deployment <deployment-name>
+    Look for:
+    Events: Check for errors or issues (e.g., ImagePullBackOff or CrashLoopBackOff).
+    Desired vs Current replicas.
+4. Check Pod Status
+    List the pods associated with the deployment to ensure they are running:
+    kubectl get pods
+    This displays the status of the pods (Running, Pending, CrashLoopBackOff, etc.).
+    If needed, you can filter pods by label:
+    kubectl get pods -l app=<app-label>
+5. Inspect Pods for Issues
+    If pods are not running, inspect the logs or events:
+    Describe the Pod:
+    kubectl describe pod <pod-name>
+    View Logs:
+    kubectl logs <pod-name>
+    Look for errors such as container image pull issues or misconfigurations.
+6. Verify Services (Optional)
+    If the deployment is exposing services, ensure the service is correctly created and reachable:
+    kubectl get services
+    For detailed service configuration:
+    kubectl describe service <service-name>
+7. Check Resource Status
+    For overall health, ensure all resources are in the desired state:
+    kubectl get all
+8. Check Events
+    Use the events log to find any unexpected issues:
+    kubectl get events --sort-by='.metadata.creationTimestamp'
+9. Debugging Common Issues
+    If issues arise:
+    Check if the YAML syntax is valid.
+    Validate the deployment by running a dry-run:
+    kubectl apply -f k8s/deployment.yaml --dry-run=client
+    Use kubectl edit deployment <deployment-name> to fix any issues directly.
+    These steps will help ensure the deployment is successfully applied and troubleshoot any issues that might occur. Let me know if you need further assistance!

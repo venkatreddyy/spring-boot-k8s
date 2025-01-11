@@ -1,0 +1,141 @@
+Step-by-Step Deployment Guide
+Step 1: Build and Package the Spring Boot Application
+    Navigate to the project directory and build the application using Maven:
+     cd /path/to/spring-boot-k8s
+     mvn clean install
+     This will create a target/hello-springboot-0.0.1-SNAPSHOT.jar file.
+
+Step 2: Build the Docker Image
+    Build the Docker image for the Spring Boot application. Make sure you’re in the project root directory where the Dockerfile is located.
+    docker build -t venkat34/hello-springboot:latest .
+    Replace your-registry with the name of your Docker registry (e.g., docker.io/your-username for Docker Hub).
+
+Step 3: Push the Docker Image to the Registry
+        Log in to your Docker registry:
+        docker login
+    Then push the image:
+    docker push venkat34/hello-springboot:latest
+        veification steps:
+        kubectl get deployments
+        kubectl describe deployment hello-springboot
+
+Step 4: Update Kubernetes Deployment YAML
+    In k8s/deployment.yaml, ensure the Docker image name matches the image you just pushed:
+    containers:
+      - name: hello-springboot
+        image: venkat34/hello-springboot:latest
+
+   before executing step5  cluster should be created:
+   ➜  ~    kind create cluster --name my-cluster
+   Creating cluster "my-cluster" ...
+    ✓ Ensuring node image (kindest/node:v1.31.0) 🖼
+    ✓ Preparing nodes 📦
+    ✓ Writing configuration 📜
+    ✓ Starting control-plane 🕹️
+    ✓ Installing CNI 🔌
+    ✓ Installing StorageClass 💾
+   Set kubectl context to "kind-my-cluster"
+   You can now use your cluster with:
+
+   kubectl cluster-info --context kind-my-cluster
+
+
+   ➜  ~ kind get clusters
+   my-cluster
+   ➜  ~ kubectl config current-context
+   kind-my-cluster
+   ➜  ~ kubectl get nodes
+   NAME                       STATUS   ROLES           AGE   VERSION
+   my-cluster-control-plane   Ready    control-plane   53s   v1.31.0
+   ➜  ~
+
+
+   ➜  ~ kubectl config current-context
+   kind-my-cluster
+   ➜  ~ kubectl get nodes
+   NAME                       STATUS   ROLES           AGE   VERSION
+   my-cluster-control-plane   Ready    control-plane   53s   v1.31.0
+   ➜  ~ kubectl config view
+   apiVersion: v1
+   clusters:
+   - cluster:
+       certificate-authority-data: DATA+OMITTED
+       server: https://127.0.0.1:53056
+     name: kind-my-cluster
+   contexts:
+   - context:
+       cluster: kind-my-cluster
+       user: kind-my-cluster
+     name: kind-my-cluster
+   current-context: kind-my-cluster
+   kind: Config
+   preferences: {}
+   users:
+   - name: kind-my-cluster
+     user:
+       client-certificate-data: DATA+OMITTED
+       client-key-data: DATA+OMITTED
+   ➜  ~
+
+
+   ➜  k8s git:(master) ✗ kubectl apply -f deployment.yaml
+   deployment.apps/hello-springboot created
+   ➜  k8s git:(master) ✗
+
+   ➜  k8s git:(master) ✗ kubectl apply -f service.yaml
+   service/hello-springboot-service created
+   ➜  k8s git:(master) ✗
+
+Step 5: Apply Kubernetes Manifests
+    Use kubectl to deploy the application and service to your Kubernetes cluster:
+    kubectl apply -f k8s/deployment.yaml
+    kubectl apply -f k8s/service.yaml
+    These commands will:
+    Create a Deployment for your Spring Boot application, which manages pods for the app.
+    Create a Service to expose the application on a LoadBalancer.
+Step 6: Verify Deployment
+    Check if the deployment and pods are running successfully:
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+    The kubectl get services command should display the External IP for the service. If it’s a LoadBalancer service on a managed Kubernetes cluster, it might take a minute for the IP to appear.
+
+Step 7: Access the Application
+    Once the service’s External IP is available, you can access the application:
+    kubectl port-forward svc/hello-springboot-service 8080:80
+    Forwarding from 127.0.0.1:8080 -> 8080
+    Forwarding from [::1]:8080 -> 8080
+    Handling connection for 8080
+    Handling connection for 8080
+
+     curl http://localhost:8080/greet?name=John
+     Hello, John!
+    curl http://<external-ip>/greet?name=YourName
+    Replace <external-ip> with the actual IP displayed from the kubectl get services command.
+
+# Create clusters.
+$ kind create cluster --name test-cluster
+
+# Get clusters.
+$ kind get clusters
+test-cluster
+
+# Get nodes of a cluster.
+$ kind get nodes --name test-cluster
+test-cluster-control-plane
+
+curl http://10.96.0.1/greet?name=John
+09:58:35.980 [main] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+09:58:35.981 [main] INFO tc.mysql:8.3.0 -- Creating container for image: mysql:8.3.0
+
+kubectl apply -f k8s/service.yaml
+kubectl port-forward svc/hello-springboot-service 8080:80
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+Handling connection for 8080
+ curl http://localhost:8080/greet?name=John
+
+AKS
+AKS azure kubernetes cluster
+AKS amazone
